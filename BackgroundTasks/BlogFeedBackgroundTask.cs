@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,16 +24,44 @@ namespace BackgroundTasks
             BackgroundTaskDeferral deferral = taskInstance.GetDeferral();
 
             // Download the feed.
-            var feed = await GetMSDNBlogFeed();
+            string info = getCoronaInfo();
+            //var feed = await GetCoronaData();
 
             // Update the live tile with the feed items.
-            UpdateTile(feed);
+            //UpdateTile(feed); //TODO 
 
             // Inform the system that the task is finished.
             deferral.Complete();
         }
 
-        private static async Task<SyndicationFeed> GetMSDNBlogFeed()
+        private static string getCoronaInfo()
+        {
+            string info = "";
+            WebRequest request = WebRequest.Create(
+              "https://thevirustracker.com/free-api?global=stats");
+            WebResponse response = request.GetResponse();
+            Debug.WriteLine(((HttpWebResponse)response).StatusDescription);
+
+            using (Stream dataStream = response.GetResponseStream())
+            {
+                // Open the stream using a StreamReader for easy access.
+                StreamReader reader = new StreamReader(dataStream);
+                // Read the content.
+                string responseFromServer = reader.ReadToEnd();
+                info = responseFromServer;
+                // Display the content.
+                Debug.WriteLine(responseFromServer);
+            }
+
+            response.Close();
+
+            
+
+
+            return info;
+        }
+
+        private static async Task<SyndicationFeed> GetCoronaData()
         {
             SyndicationFeed feed = null;
 
@@ -43,7 +73,7 @@ namespace BackgroundTasks
                 client.SetRequestHeader(customHeaderName, customHeaderValue);
 
                 // Download the feed.
-                feed = await client.RetrieveFeedAsync(new Uri(feedUrl));
+                feed = await client.RetrieveFeedAsync(new Uri(feedUrl)); // TODO błąd
             }
             catch (Exception ex)
             {
