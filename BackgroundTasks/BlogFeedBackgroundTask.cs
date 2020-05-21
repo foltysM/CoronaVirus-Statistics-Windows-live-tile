@@ -86,6 +86,6 @@ namespace BackgroundTasks
         static string customHeaderValue = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
 
         static string textElementName = "text";
-        static string feedUrl = @"http://blogs.msdn.com/b/MainFeed.aspx?Type=BlogsOnly";
+        static string feedUrl = @"https://thevirustracker.com/free-api?global=stats";
     }
 }
