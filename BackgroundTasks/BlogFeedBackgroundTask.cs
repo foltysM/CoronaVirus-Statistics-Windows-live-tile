@@ -13,10 +13,24 @@ using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
 using Windows.Web.Syndication;
 
+// For JSON conversion
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace BackgroundTasks
 {
     public sealed class BlogFeedBackgroundTask : IBackgroundTask
     {
+        class InformationCorona
+        {
+            string recovered { get; set; }
+            string deaths { get; set; }
+            string active_cases { get; set; }
+            string new_cases { get; set; }
+            string new_deaths { get; set; }
+            string countries { get; set; }
+        }
+
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
             // Get a deferral, to prevent the task from closing prematurely
@@ -54,11 +68,12 @@ namespace BackgroundTasks
             }
 
             response.Close();
-
-            
-
-
             return info;
+        }
+
+        private InformationCorona()
+        {
+
         }
 
         private static async Task<SyndicationFeed> GetCoronaData()
