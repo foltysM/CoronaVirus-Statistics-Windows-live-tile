@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -12,10 +13,7 @@ using Windows.ApplicationModel.Background;
 using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
 using Windows.Web.Syndication;
-
-// For JSON conversion
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace BackgroundTasks
 {
@@ -23,12 +21,30 @@ namespace BackgroundTasks
     {
         class InformationCorona
         {
-            string recovered { get; set; }
-            string deaths { get; set; }
-            string active_cases { get; set; }
-            string new_cases { get; set; }
-            string new_deaths { get; set; }
-            string countries { get; set; }
+            public string total_cases { get; set; }
+            public string total_recovered { get; set; }
+            public string total_unresolved { get; set; }
+            public string total_deaths { get; set; }
+            public string total_new_cases_today { get; set; }
+            public string total_new_deaths_today { get; set; }
+            public string total_active_cases { get; set; }
+            public string total_serious_cases { get; set; }          
+            public string total_affected_countries { get; set; }
+        }
+        class InfoExport
+        {
+            public int total_cases { get; set; }
+            public int total_deaths { get; set; }
+            public int new_cases_today { get; set; }
+            public int new_deaths_today { get; set; }
+            public int countries { get; set; }
+        }
+
+        class ReceivedInfo
+        {
+            public List<InformationCorona> results { get; set; }
+
+            public string stat { get; set; }
         }
 
         public async void Run(IBackgroundTaskInstance taskInstance)
@@ -38,7 +54,7 @@ namespace BackgroundTasks
             BackgroundTaskDeferral deferral = taskInstance.GetDeferral();
 
             // Download the feed.
-            string info = getCoronaInfo();
+            InfoExport info = getCoronaInfo();
             //var feed = await GetCoronaData();
 
             // Update the live tile with the feed items.
@@ -48,9 +64,9 @@ namespace BackgroundTasks
             deferral.Complete();
         }
 
-        private static string getCoronaInfo()
+        private static InfoExport getCoronaInfo()
         {
-            string info = "";
+            string infoJSON = "";
             WebRequest request = WebRequest.Create(
               "https://thevirustracker.com/free-api?global=stats");
             WebResponse response = request.GetResponse();
@@ -62,19 +78,27 @@ namespace BackgroundTasks
                 StreamReader reader = new StreamReader(dataStream);
                 // Read the content.
                 string responseFromServer = reader.ReadToEnd();
-                info = responseFromServer;
+                infoJSON = responseFromServer;
                 // Display the content.
                 Debug.WriteLine(responseFromServer);
             }
+             response.Close();
+            
+            ReceivedInfo infObj = JsonConvert.DeserializeObject<ReceivedInfo>(infoJSON);
 
-            response.Close();
-            return info;
+            InfoExport export = new InfoExport();
+            export.countries = int.Parse(infObj.results[0].total_affected_countries);
+            export.new_cases_today = int.Parse(infObj.results[0].total_new_cases_today);
+            export.new_deaths_today = int.Parse(infObj.results[0].total_new_deaths_today);
+            export.total_cases = int.Parse(infObj.results[0].total_cases);
+            export.total_deaths = int.Parse(infObj.results[0].total_deaths);
+
+
+
+
+            return export;
         }
 
-        private InformationCorona()
-        {
-
-        }
 
         private static async Task<SyndicationFeed> GetCoronaData()
         {
