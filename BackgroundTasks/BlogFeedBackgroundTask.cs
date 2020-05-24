@@ -59,7 +59,6 @@ namespace BackgroundTasks
             //var feed = await GetCoronaData();
 
             // Update the live tile with the feed items.
-            //UpdateTile(feed); //TODO 
             update(info);
             // Inform the system that the task is finished.
             deferral.Complete();
@@ -186,27 +185,7 @@ namespace BackgroundTasks
             
             ///TileUpdateManager.CreateTileUpdaterForApplication().Clear();
         }
-        private static async Task<SyndicationFeed> GetCoronaData()
-        {
-            SyndicationFeed feed = null;
-
-            try
-            {
-                // Create a syndication client that downloads the feed.  
-                SyndicationClient client = new SyndicationClient();
-                client.BypassCacheOnRetrieve = true;
-                client.SetRequestHeader(customHeaderName, customHeaderValue);
-
-                // Download the feed.
-                feed = await client.RetrieveFeedAsync(new Uri(feedUrl)); // TODO błąd
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.ToString());
-            }
-
-            return feed;
-        }
+       
 
 
         // Although most HTTP servers do not require User-Agent header, others will reject the request or return
@@ -214,7 +193,6 @@ namespace BackgroundTasks
         static string customHeaderName = "User-Agent";
         static string customHeaderValue = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
 
-        static string textElementName = "text";
         static string feedUrl = @"https://thevirustracker.com/free-api?global=stats";
     }
 }
