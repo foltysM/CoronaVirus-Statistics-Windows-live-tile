@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -14,10 +15,13 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.Web.Syndication;
 using System.Threading.Tasks;
+using Windows.Media.Core;
+using Windows.Media.Playback;
+using Windows.Storage;
 using Windows.ApplicationModel.Background;
 using Windows.Data.Xml.Dom;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
+
 
 namespace LiveTile9
 {
@@ -26,10 +30,13 @@ namespace LiveTile9
     /// </summary>
     public sealed partial class MainPage : Page
     {
+
         public MainPage()
         {
             this.InitializeComponent();
+            //this.mediaPlayer = new MediaPlayer();
         }
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             this.RegisterBackgroundTask();
@@ -49,16 +56,33 @@ namespace LiveTile9
                         task.Value.Unregister(true);
                     }
                 }
-
+                
                 BackgroundTaskBuilder taskBuilder = new BackgroundTaskBuilder();
                 taskBuilder.Name = taskName;
                 taskBuilder.TaskEntryPoint = taskEntryPoint;
-                taskBuilder.SetTrigger(new TimeTrigger(15, false));
+                uint rRate = Convert.ToUInt32(refreshRate); 
+                taskBuilder.SetTrigger(new TimeTrigger(rRate, false));
                 var registration = taskBuilder.Register();
             }
         }
 
         private const string taskName = "BlogFeedBackgroundTask";
         private const string taskEntryPoint = "BackgroundTasks.BlogFeedBackgroundTask";
+
+        public double refreshRate { get; private set; }
+
+        private void TextBlock_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Slider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            double newValueMy = e.NewValue;
+            refreshRate = newValueMy;
+            Console.WriteLine(newValueMy);
+        }
+
+        
     }
 }

@@ -7,45 +7,118 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-
-// Added during quickstart
 using Windows.ApplicationModel.Background;
 using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
 using Windows.Web.Syndication;
 using Newtonsoft.Json;
 using Microsoft.Toolkit.Uwp.Notifications;
+using Windows.Media.Playback;
+using Microsoft.CognitiveServices.Speech;
+using Windows.Storage;
+using Windows.Media.Core;
 
 namespace BackgroundTasks
 {
     public sealed class BlogFeedBackgroundTask : IBackgroundTask
     {
+        
+
+
+        private MediaPlayer mediaPlayer;
+        private string text2Speech = "placeholder";
+
+        public BlogFeedBackgroundTask()
+        {
+            this.mediaPlayer = new MediaPlayer();
+        }
+
+        private async void CoronaSpeakAsync()
+        {
+            // Creates an instance of a speech config with specified subscription key and service region.
+            // Replace with your own subscription key and service region (e.g., "westus").
+            var config = SpeechConfig.FromSubscription("b1323ad73dda43038546ea1a82594e8a", "northeurope");
+
+            try
+            {
+                // Creates a speech synthesizer.
+                using (var synthesizer = new SpeechSynthesizer(config, null))
+                {
+                    
+                    using (var result = await synthesizer.SpeakTextAsync(this.text2Speech).ConfigureAwait(false))
+                    {
+                        // Checks result.
+                        if (result.Reason == ResultReason.SynthesizingAudioCompleted)
+                        {
+                            Console.WriteLine("Speech Synthesis Succeeded.");
+                            Console.WriteLine(NotifyType.StatusMessage);
+
+                            // Since native playback is not yet supported on UWP (currently only supported on Windows/Linux Desktop),
+                            // use the WinRT API to play audio here as a short term solution.
+                            using (var audioStream = AudioDataStream.FromResult(result))
+                            {
+                                // Save synthesized audio data as a wave file and use MediaPlayer to play it
+                                var filePath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "outputaudio.wav");
+                                await audioStream.SaveToWaveFileAsync(filePath);
+                                mediaPlayer.Source = MediaSource.CreateFromStorageFile(await StorageFile.GetFileFromPathAsync(filePath));
+                                mediaPlayer.Play();
+                            }
+                        }
+                        else if (result.Reason == ResultReason.Canceled)
+                        {
+                            var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
+
+                            StringBuilder sb = new StringBuilder();
+                            sb.AppendLine($"CANCELED: Reason={cancellation.Reason}");
+                            sb.AppendLine($"CANCELED: ErrorCode={cancellation.ErrorCode}");
+                            sb.AppendLine($"CANCELED: ErrorDetails=[{cancellation.ErrorDetails}]");
+
+                            Console.WriteLine(sb.ToString());
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine(NotifyType.ErrorMessage);
+            }
+        }
+      
+        private enum NotifyType
+        {
+            StatusMessage,
+            ErrorMessage
+        };
+
+
+
         class InformationCorona
         {
-            public string total_cases { get; set; }
-            public string total_recovered { get; set; }
-            public string total_unresolved { get; set; }
-            public string total_deaths { get; set; }
-            public string total_new_cases_today { get; set; }
-            public string total_new_deaths_today { get; set; }
-            public string total_active_cases { get; set; }
-            public string total_serious_cases { get; set; }          
-            public string total_affected_countries { get; set; }
+            public string Total_cases { get; set; }
+            public string Total_recovered { get; set; }
+            public string Total_unresolved { get; set; }
+            public string Total_deaths { get; set; }
+            public string Total_new_cases_today { get; set; }
+            public string Total_new_deaths_today { get; set; }
+            public string Total_active_cases { get; set; }
+            public string Total_serious_cases { get; set; }          
+            public string Total_affected_countries { get; set; }
         }
         class InfoExport
         {
-            public int total_cases { get; set; }
-            public int total_deaths { get; set; }
-            public int new_cases_today { get; set; }
-            public int new_deaths_today { get; set; }
-            public int countries { get; set; }
+            public int Total_cases { get; set; }
+            public int Total_deaths { get; set; }
+            public int New_cases_today { get; set; }
+            public int New_deaths_today { get; set; }
+            public int Countries { get; set; }
         }
 
         class ReceivedInfo
         {
-            public List<InformationCorona> results { get; set; }
+            public List<InformationCorona> Results { get; set; }
 
-            public string stat { get; set; }
+            public string Stat { get; set; }
         }
 
         public async void Run(IBackgroundTaskInstance taskInstance)
@@ -55,20 +128,20 @@ namespace BackgroundTasks
             BackgroundTaskDeferral deferral = taskInstance.GetDeferral();
 
             // Download the feed.
-            InfoExport info = getCoronaInfo();
+            InfoExport info = GetCoronaInfo();
             //var feed = await GetCoronaData();
 
             // Update the live tile with the feed items.
-            update(info);
+            UpdateAsync(info);
+            CoronaSpeakAsync();
             // Inform the system that the task is finished.
             deferral.Complete();
         }
 
-        private static InfoExport getCoronaInfo()
+        private static InfoExport GetCoronaInfo()
         {
             string infoJSON = "";
-            WebRequest request = WebRequest.Create(
-              "https://thevirustracker.com/free-api?global=stats");
+            WebRequest request = WebRequest.Create(feedUrl);
             WebResponse response = request.GetResponse();
             Debug.WriteLine(((HttpWebResponse)response).StatusDescription);
 
@@ -86,25 +159,24 @@ namespace BackgroundTasks
             
             ReceivedInfo infObj = JsonConvert.DeserializeObject<ReceivedInfo>(infoJSON);
 
-            InfoExport export = new InfoExport();
-            export.countries = int.Parse(infObj.results[0].total_affected_countries);
-            export.new_cases_today = int.Parse(infObj.results[0].total_new_cases_today);
-            export.new_deaths_today = int.Parse(infObj.results[0].total_new_deaths_today);
-            export.total_cases = int.Parse(infObj.results[0].total_cases);
-            export.total_deaths = int.Parse(infObj.results[0].total_deaths);
-
-
-
+            InfoExport export = new InfoExport
+            {
+                Countries = int.Parse(infObj.Results[0].Total_affected_countries),
+                New_cases_today = int.Parse(infObj.Results[0].Total_new_cases_today),
+                New_deaths_today = int.Parse(infObj.Results[0].Total_new_deaths_today),
+                Total_cases = int.Parse(infObj.Results[0].Total_cases),
+                Total_deaths = int.Parse(infObj.Results[0].Total_deaths)
+            };
 
             return export;
         }
 
-        private static void update(InfoExport info)
+        private static async Task UpdateAsync(InfoExport info)
         {
-            string number_of_gc = info.total_cases.ToString();
-            string number_of_gd = info.total_deaths.ToString();
-            string number_of_tc = info.new_cases_today.ToString();
-            string number_of_td = info.total_deaths.ToString();
+            string number_of_gc = info.Total_cases.ToString();
+            string number_of_gd = info.Total_deaths.ToString();
+            string number_of_tc = info.New_cases_today.ToString();
+            string number_of_td = info.Total_deaths.ToString();
 
             string global_c = "Global infections: " + number_of_gc;
             string global_d = "Global deaths: " + number_of_gd;
@@ -182,17 +254,18 @@ namespace BackgroundTasks
 
             // And send the notification
             TileUpdateManager.CreateTileUpdaterForApplication().Update(notification);
+
             
-            ///TileUpdateManager.CreateTileUpdaterForApplication().Clear();
+            //Task returnedTask = GetTaskAsync();
         }
-       
+
 
 
         // Although most HTTP servers do not require User-Agent header, others will reject the request or return
         // a different response if this header is missing. Use SetRequestHeader() to add custom headers.
-        static string customHeaderName = "User-Agent";
-        static string customHeaderValue = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
+        //static string customHeaderName = "User-Agent";
+        //static string customHeaderValue = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)";
 
-        static string feedUrl = @"https://thevirustracker.com/free-api?global=stats";
+        private static readonly string feedUrl = @"https://thevirustracker.com/free-api?global=stats";
     }
 }

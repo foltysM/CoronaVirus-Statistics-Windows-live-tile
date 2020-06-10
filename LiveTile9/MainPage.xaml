@@ -9,6 +9,9 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <Slider HorizontalAlignment="Left" Margin="19,45,0,0" VerticalAlignment="Top" Width="100" ValueChanged="Slider_ValueChanged" Minimum="15" Maximum="120"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-3.224,1.053" Height="27" Width="123" SelectionChanged="TextBlock_SelectionChanged" Text="SET REFRESH TIME"/>
+        
 
     </Grid>
 </Page>
