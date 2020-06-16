@@ -23,10 +23,8 @@ namespace BackgroundTasks
     public sealed class BlogFeedBackgroundTask : IBackgroundTask
     {
         
-
-
         private MediaPlayer mediaPlayer;
-        private string text2Speech = "placeholder";
+        private static string text2Speech = "";
 
         public BlogFeedBackgroundTask()
         {
@@ -37,7 +35,9 @@ namespace BackgroundTasks
         {
             // Creates an instance of a speech config with specified subscription key and service region.
             // Replace with your own subscription key and service region (e.g., "westus").
+           // var config = SpeechConfig.FromSubscription("b1323ad73dda43038546ea1a82594e8a", "northeurope");
             var config = SpeechConfig.FromSubscription("b1323ad73dda43038546ea1a82594e8a", "northeurope");
+
 
             try
             {
@@ -45,7 +45,7 @@ namespace BackgroundTasks
                 using (var synthesizer = new SpeechSynthesizer(config, null))
                 {
                     
-                    using (var result = await synthesizer.SpeakTextAsync(this.text2Speech).ConfigureAwait(false))
+                    using (var result = await synthesizer.SpeakTextAsync(text2Speech).ConfigureAwait(false))
                     {
                         // Checks result.
                         if (result.Reason == ResultReason.SynthesizingAudioCompleted)
@@ -132,7 +132,7 @@ namespace BackgroundTasks
             //var feed = await GetCoronaData();
 
             // Update the live tile with the feed items.
-            UpdateAsync(info);
+            await UpdateAsync(info);
             CoronaSpeakAsync();
             // Inform the system that the task is finished.
             deferral.Complete();
@@ -183,6 +183,7 @@ namespace BackgroundTasks
             string todays_c = "Today's infections: " + number_of_tc;
             string todays_d = "Today's deaths: " + number_of_td;
 
+            text2Speech = global_c + global_d + todays_c + todays_d;
             // Construct the tile content            
             TileContent content = new TileContent()
             {
