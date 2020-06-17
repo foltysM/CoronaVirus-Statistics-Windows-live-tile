@@ -2,22 +2,17 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Background;
-using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
-using Windows.Web.Syndication;
 using Newtonsoft.Json;
 using Microsoft.Toolkit.Uwp.Notifications;
 using Windows.Media.Playback;
 using Microsoft.CognitiveServices.Speech;
 using Windows.Storage;
 using Windows.Media.Core;
-using System.Runtime.InteropServices;
 
 namespace BackgroundTasks
 {

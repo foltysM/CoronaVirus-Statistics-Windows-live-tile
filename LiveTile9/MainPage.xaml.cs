@@ -1,25 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using Windows.Web.Syndication;
-using System.Threading.Tasks;
-using Windows.Media.Core;
 using Windows.Media.Playback;
-using Windows.Storage;
 using Windows.ApplicationModel.Background;
-using Windows.Data.Xml.Dom;
 using System.Runtime.InteropServices;
 
 namespace LiveTile9
@@ -77,11 +62,11 @@ namespace LiveTile9
         internal static class NativeMethods //nowa klasa z metodami
         {
             // Declares a managed prototype for unmanaged function.
-            [DllImport("E:\\LiveTile\\AsmTest.dll")]
+            [DllImport("C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.26.28801\\bin\\Hostx64\\arm\\AsmTest.dll")]
             internal static extern int CPUSpeed();
-            [DllImport("E:\\LiveTile\\AsmTest.dll")]
+            [DllImport("C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.26.28801\\bin\\Hostx64\\arm\\AsmTest.dll")]
             internal static extern int getCPUFamily();
-            [DllImport("E:\\LiveTile\\AsmTest.dll")]
+            [DllImport("C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Tools\\MSVC\\14.26.28801\\bin\\Hostx64\\arm\\AsmTest.dll")]
             internal static extern int getCPUModel();
         }
 
