@@ -17,6 +17,7 @@ using Windows.Media.Playback;
 using Microsoft.CognitiveServices.Speech;
 using Windows.Storage;
 using Windows.Media.Core;
+using System.Runtime.InteropServices;
 
 namespace BackgroundTasks
 {
@@ -91,7 +92,16 @@ namespace BackgroundTasks
             ErrorMessage
         };
 
-
+        internal static class NativeMethods //nowa klasa z metodami
+        {
+            // Declares a managed prototype for unmanaged function.
+            [DllImport("E:\\LiveTile\\AsmTest.dll")]
+            internal static extern int CPUSpeed();
+            [DllImport("E:\\LiveTile\\AsmTest.dll")]
+            internal static extern int getCPUFamily();
+            [DllImport("E:\\LiveTile\\AsmTest.dll")]
+            internal static extern int getCPUModel();
+        }
 
         class InformationCorona
         {
@@ -123,6 +133,10 @@ namespace BackgroundTasks
 
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
+            int CPU_Speed = NativeMethods.CPUSpeed(); 
+            int cpumodel = NativeMethods.getCPUModel();
+            int family = NativeMethods.getCPUFamily();
+
             // Get a deferral, to prevent the task from closing prematurely
             // while asynchronous code is still running.
             BackgroundTaskDeferral deferral = taskInstance.GetDeferral();
