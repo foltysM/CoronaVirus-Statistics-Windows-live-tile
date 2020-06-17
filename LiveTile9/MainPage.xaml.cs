@@ -17,10 +17,10 @@ namespace LiveTile9
     {
 
         public MainPage()
-        {            
+        {
+            this.InitializeComponent();
             if (czytaj.IsChecked == true)
-            {
-                this.InitializeComponent();
+            {                
                 this.mediaPlayer = new MediaPlayer();
             }
             int CPU_Speed = NativeMethods.CPUSpeed();
