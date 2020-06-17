@@ -11,7 +11,10 @@
     <Grid>
         <Slider HorizontalAlignment="Left" Margin="19,45,0,0" VerticalAlignment="Top" Width="100" ValueChanged="Slider_ValueChanged" Minimum="15" Maximum="120"/>
         <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-3.224,1.053" Height="27" Width="123" SelectionChanged="TextBlock_SelectionChanged" Text="SET REFRESH TIME"/>
-        
+        <TextBlock x:Name="speed" HorizontalAlignment="Left" Margin="19,77,0,0" Text="CPU Speed" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.302,0.316"/>
+        <TextBlock x:Name="model" HorizontalAlignment="Left" Margin="19,101,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.302,0.316" SelectionChanged="TextBlock_SelectionChanged_1"><Run Text="CPU "/><Run Text="Model"/></TextBlock>
+        <TextBlock x:Name="family" HorizontalAlignment="Left" Margin="19,125,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.302,0.316"><Run Text="CPU "/><Run Text="Family"/></TextBlock>
+
 
     </Grid>
 </Page>

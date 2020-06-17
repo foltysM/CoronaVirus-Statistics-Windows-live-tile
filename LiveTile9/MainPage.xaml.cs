@@ -20,11 +20,11 @@ using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.ApplicationModel.Background;
 using Windows.Data.Xml.Dom;
-
-
+using System.Runtime.InteropServices;
 
 namespace LiveTile9
 {
+    
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -34,7 +34,16 @@ namespace LiveTile9
         public MainPage()
         {
             this.InitializeComponent();
-            //this.mediaPlayer = new MediaPlayer();
+            this.mediaPlayer = new MediaPlayer();
+            int CPU_Speed = NativeMethods.CPUSpeed();
+            int cpumodel = NativeMethods.getCPUModel();
+            int familyINT = NativeMethods.getCPUFamily();
+            string models = cpumodel.ToString();
+            string speeds = CPU_Speed.ToString();
+            string familys = familyINT.ToString();
+            model.Text = "CPU Model: " + models;
+            family.Text = "CPU Family: "+familys;
+            speed.Text = "CPU Speed: " + speeds;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -65,9 +74,24 @@ namespace LiveTile9
                 var registration = taskBuilder.Register();
             }
         }
+        internal static class NativeMethods //nowa klasa z metodami
+        {
+            // Declares a managed prototype for unmanaged function.
+            [DllImport("E:\\LiveTile\\AsmTest.dll")]
+            internal static extern int CPUSpeed();
+            [DllImport("E:\\LiveTile\\AsmTest.dll")]
+            internal static extern int getCPUFamily();
+            [DllImport("E:\\LiveTile\\AsmTest.dll")]
+            internal static extern int getCPUModel();
+        }
 
         private const string taskName = "BlogFeedBackgroundTask";
         private const string taskEntryPoint = "BackgroundTasks.BlogFeedBackgroundTask";
+
+        //TextBlock speed = new TextBlock();
+        //TextBlock model = new TextBlock();
+        //TextBlock family = new TextBlock();
+        private MediaPlayer mediaPlayer;
 
         public double refreshRate { get; private set; }
 
@@ -83,6 +107,9 @@ namespace LiveTile9
             Console.WriteLine(newValueMy);
         }
 
-        
+        private void TextBlock_SelectionChanged_1(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
