@@ -14,6 +14,7 @@
         <TextBlock x:Name="speed" HorizontalAlignment="Left" Margin="19,77,0,0" Text="CPU Speed" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.302,0.316"/>
         <TextBlock x:Name="model" HorizontalAlignment="Left" Margin="19,101,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.302,0.316" SelectionChanged="TextBlock_SelectionChanged_1"><Run Text="CPU "/><Run Text="Model"/></TextBlock>
         <TextBlock x:Name="family" HorizontalAlignment="Left" Margin="19,125,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.302,0.316"><Run Text="CPU "/><Run Text="Family"/></TextBlock>
+        <CheckBox x:Name="czytaj" Content="Wlacz czytanie" Margin="158,61,0,0" VerticalAlignment="Top"/>
 
 
     </Grid>

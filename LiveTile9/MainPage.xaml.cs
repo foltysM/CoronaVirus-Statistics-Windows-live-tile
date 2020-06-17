@@ -17,9 +17,12 @@ namespace LiveTile9
     {
 
         public MainPage()
-        {
-            this.InitializeComponent();
-            this.mediaPlayer = new MediaPlayer();
+        {            
+            if (czytaj.IsChecked == true)
+            {
+                this.InitializeComponent();
+                this.mediaPlayer = new MediaPlayer();
+            }
             int CPU_Speed = NativeMethods.CPUSpeed();
             int cpumodel = NativeMethods.getCPUModel();
             int familyINT = NativeMethods.getCPUFamily();
@@ -27,7 +30,7 @@ namespace LiveTile9
             string speeds = CPU_Speed.ToString();
             string familys = familyINT.ToString();
             model.Text = "CPU Model: " + models;
-            family.Text = "CPU Family: "+familys;
+            family.Text = "CPU Family: " + familys;
             speed.Text = "CPU Speed: " + speeds;
         }
 
